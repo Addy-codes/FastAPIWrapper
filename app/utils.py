@@ -10,7 +10,7 @@ interactsh_logs_file_path = 'interactsh-logs.txt'
 
 def start_interactsh_client_in_background():
     with open(interactsh_payload_file_path, 'w') as outfile:
-        subprocess.Popen(['./interactsh-client', '-ps', '-v', '-o', 'interactsh-logs.txt'], stdout=outfile, stderr=subprocess.STDOUT)
+        subprocess.Popen(['interactsh-client', '-ps', '-v', '-o', 'interactsh-logs.txt'], stdout=outfile, stderr=subprocess.STDOUT)
 
 async def read_payload_url_from_file():
     await asyncio.sleep(5)
