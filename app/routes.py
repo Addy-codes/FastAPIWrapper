@@ -2,6 +2,7 @@ from fastapi import APIRouter, HTTPException, Query
 import subprocess
 import asyncio
 import os, re
+from datetime import datetime
 
 # Create a router for the interactsh endpoints
 router = APIRouter()
@@ -39,30 +40,39 @@ async def get_url():
 # Path to the log file where interactions are stored
 interactsh_logs_file_path = 'interactsh-logs.txt'
 
-async def get_interactions_from_file(url: str):
+def parse_timestamp(timestamp_str):
+    # Adjust the format according to how timestamps are formatted in your log files
+    return datetime.strptime(timestamp_str, "%Y-%m-%d %H:%M:%S")
+
+async def get_interactions_from_file(url: str, start_timestamp: str = None, end_timestamp: str = None):
     if not os.path.exists(interactsh_logs_file_path):
         raise HTTPException(status_code=500, detail="Interactsh log file not found")
+    
+    start_dt = parse_timestamp(start_timestamp) if start_timestamp else None
+    end_dt = parse_timestamp(end_timestamp) if end_timestamp else None
+
     try:
         interactions = []
-        # Extract the identifier from the URL
-        identifier = url.split('.')[0]  # Assuming the URL is in the format: identifier.oast.site
+        identifier = url.split('.')[0]
         with open(interactsh_logs_file_path, 'r') as file:
             for line in file:
-                # Modify the check to match the line format including the identifier
                 if identifier in line and "Received HTTP interaction from" in line:
-                    # Parse the IP address and timestamp from the line
                     match = re.search(r"\] Received HTTP interaction from ([\d\.]+) at ([\d\- :]+)", line)
                     if match:
-                        interaction = f"Received HTTP interaction from {match.group(1)} at {match.group(2)}"
-                        interactions.append(interaction)
+                        interaction_dt = parse_timestamp(match.group(2))
+                        if (not start_dt or interaction_dt >= start_dt) and (not end_dt or interaction_dt <= end_dt):
+                            interaction = f"Received HTTP interaction from {match.group(1)} at {match.group(2)}"
+                            interactions.append(interaction)
         return interactions
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error reading interactsh log file: {e}")
 
 @router.get("/getInteractions")
-async def get_interactions(url: str = Query(..., description="URL of the testing server to fetch interactions for")):
-    interactions = await get_interactions_from_file(url)
+async def get_interactions(url: str = Query(..., description="URL of the testing server to fetch interactions for"),
+                           start_timestamp: str = Query(None, description="Start of the timestamp range (inclusive)"),
+                           end_timestamp: str = Query(None, description="End of the timestamp range (inclusive)")):
+    interactions = await get_interactions_from_file(url, start_timestamp, end_timestamp)
     if interactions:
         return {"interactions": interactions}
     else:
-        return {"message": "No interactions found for the specified URL"}
+        return {"message": "No interactions found for the specified URL within the given timestamp range"}
