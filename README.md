@@ -47,8 +47,27 @@ These instructions will get you a copy of the project up and running on your loc
 
 FastAPI generates interactive API documentation using Swagger UI. Once the application is running, you can visit `http://127.0.0.1/docs` in your web browser to access the documentation, try out the API endpoints, and view their responses.
 
-## Screenshots:
+## Screenshots and steps to run the API:
 
+![image](https://github.com/Addy-codes/FastAPIWrapper/assets/72205091/f8d4a52c-665f-4c6b-937b-a9775cd6c9f8)
+
+- Get the url from getURL endpoint:
+
+![image](https://github.com/Addy-codes/FastAPIWrapper/assets/72205091/3bad9e98-0c9d-4010-8150-51f37ceb663b)
+
+- Copy the url and paste it in the browser to interact with it:
+
+![image](https://github.com/Addy-codes/FastAPIWrapper/assets/72205091/a93489c3-0a61-48c1-9571-b9d843718e93)
+
+- Interactions can be viewed using the getInteractions endpoint (make sure to paste the above generated url).
+  
+- Note: Browsers automatically request additional resources like /favicon.ico after loading the main page. This behavior explains why you see multiple entries for what seems like a single interaction. When a user visits a website, the browser often makes several requests behind the scenes:
+
+![image](https://github.com/Addy-codes/FastAPIWrapper/assets/72205091/e47b4351-2093-4842-aece-58d3c140fdfd)
+
+- You can also filter the interactions using timestamps:
+
+![image](https://github.com/Addy-codes/FastAPIWrapper/assets/72205091/4fbbc17c-7884-45ca-a074-52200dc6bdb5)
 
 
 ## Development
